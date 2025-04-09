@@ -1,23 +1,28 @@
 # Variables
 TOP_MODULE     = RegisterFile
-CPP_TESTBENCH  = RegisterFile_tb.cpp
+TESTBENCH_MODULE = tb_RegisterFile
+# CPP_TESTBENCH  = RegisterFile_tb.cpp
 VSRCS          = $(TOP_MODULE).v
-OBJ_DIR        = obj_dir
-EXECUTABLE     = $(OBJ_DIR)/V$(TOP_MODULE)
-TRACE_FLAG     = --trace
+VTESTBENCH     = $(TESTBENCH_MODULE).v
+OUT_VVD 	   = $(TESTBENCH_MODULE).vvd
+# OBJ_DIR        = obj_dir
+# EXECUTABLE     = $(OBJ_DIR)/V$(TOP_MODULE)
+# TRACE_FLAG     = --trace
 VCD_FILE       = wave.vcd
 
 # Default target
 all: build run
 
 # Compile Verilog and C++ testbench
-build:
-	verilator -Wall $(TRACE_FLAG) --cc $(VSRCS) --exe $(CPP_TESTBENCH)
-	make -C $(OBJ_DIR) -f V$(TOP_MODULE).mk V$(TOP_MODULE)
+# build:
+# 	# verilator -Wall $(TRACE_FLAG) --cc $(VSRCS) --exe $(CPP_TESTBENCH)
+# 	# make -C $(OBJ_DIR) -f V$(TOP_MODULE).mk V$(TOP_MODULE)
 
+build:
+	iverilog-0.10 -o $(OUT_VVD) $(VTESTBENCH)
 # Run the simulation
 run:
-	$(EXECUTABLE)
+	vvp-0.10 $(OUT_VVD)
 
 # Open waveform with GTKWave (optional)
 wave:
@@ -25,6 +30,6 @@ wave:
 
 # Clean up generated files
 clean:
-	rm -rf $(OBJ_DIR) $(VCD_FILE)
+	rm -rf $(OUT_VVD) $(VCD_FILE)
 
 .PHONY: all build run clean wave
