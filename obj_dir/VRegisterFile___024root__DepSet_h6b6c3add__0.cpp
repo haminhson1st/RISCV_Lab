@@ -90,11 +90,13 @@ VL_INLINE_OPT void VRegisterFile___024root___nba_sequent__TOP__0(VRegisterFile__
     }
     if (vlSelfRef.reset) {
         if (vlSelfRef.reg_write) {
-            __VdlyVal__RegisterFile__DOT__registers__v0 
-                = vlSelfRef.dataD;
-            __VdlyDim0__RegisterFile__DOT__registers__v0 
-                = vlSelfRef.addrD;
-            __VdlySet__RegisterFile__DOT__registers__v0 = 1U;
+            if ((0U != (IData)(vlSelfRef.addrD))) {
+                __VdlyVal__RegisterFile__DOT__registers__v0 
+                    = vlSelfRef.dataD;
+                __VdlyDim0__RegisterFile__DOT__registers__v0 
+                    = vlSelfRef.addrD;
+                __VdlySet__RegisterFile__DOT__registers__v0 = 1U;
+            }
         }
     } else {
         __VdlySet__RegisterFile__DOT__registers__v1 = 1U;

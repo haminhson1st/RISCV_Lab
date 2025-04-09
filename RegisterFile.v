@@ -18,7 +18,11 @@ module RegisterFile(
             for (i = 0; i < 32; i = i + 1)
                 registers[i] <= 32'b0;
         end else if (reg_write == 1'b1) begin
-            registers[addrD] <= dataD;
+            if (addrD == 5'b0) begin
+                // Do not write to register 0
+            end else begin
+                registers[addrD] <= dataD;
+            end
         end
     end
 

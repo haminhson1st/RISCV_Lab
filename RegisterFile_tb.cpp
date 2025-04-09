@@ -14,12 +14,12 @@ VerilatedVcdC* tfp = nullptr;
 
 // Clock tick function with optional waveform dump
 void tick(VRegisterFile* dut) {
-    dut->clk = 0;
+    dut->clk = 1;
     dut->eval();
     if (tfp) tfp->dump(main_time);
     main_time++;
 
-    dut->clk = 1;
+    dut->clk = 0;
     dut->eval();
     if (tfp) tfp->dump(main_time);
     main_time++;
@@ -60,29 +60,24 @@ int main(int argc, char** argv) {
     dut->reset = 1;
 
     std::cout << "Testing register writes...\n";
-    write_reg(dut, 5, 0x12345678);
-    write_reg(dut, 10, 0x87654321);
-    write_reg(dut, 15, 0xA5A5A5A5);
-    write_reg(dut, 31, 0xFFFFFFFF);
+    for (int i = 1; i < 32; i++) {
+        write_reg(dut, i, 0x11111111 + i);
+    }
 
     tick(dut);
 
     std::cout << "Verifying reads...\n";
-    auto [a, b] = read_regs(dut, 5, 10);
-    std::cout << "R5:  0x" << std::hex << a << " (expected 0x12345678)\n";
-    std::cout << "R10: 0x" << std::hex << b << " (expected 0x87654321)\n";
-    assert(a == 0x12345678);
-    assert(b == 0x87654321);
+    for (int i = 1; i < 32; i++) {
+        auto [dataA, dataB] = read_regs(dut, i, (i + 1) % 32);
+        std::cout << "R" << i << ": 0x" << std::hex << dataA << " (expected 0x" << std::hex << (i + 0x11111111) << ")\n";
+        assert(dataA == (i + 0x11111111));
+        tick(dut);
+
+    }
+
 
     tick(dut);
 
-    auto [c, d] = read_regs(dut, 15, 31);
-    std::cout << "R15: 0x" << std::hex << c << " (expected 0xA5A5A5A5)\n";
-    std::cout << "R31: 0x" << std::hex << d << " (expected 0xFFFFFFFF)\n";
-    assert(c == 0xA5A5A5A5);
-    assert(d == 0xFFFFFFFF);
-
-    tick(dut);
 
     std::cout << "Re-applying reset...\n";
     dut->reset = 0;
@@ -94,12 +89,14 @@ int main(int argc, char** argv) {
     std::cout << "After reset - R5: 0x" << std::hex << rafterReset1 << ", R10: 0x" << rafterReset2 << "\n";
     assert(rafterReset1 == 0x0);
     assert(rafterReset2 == 0x0);
-
+    tick(dut);
     std::cout << "Performing edge cases test (write to R0)...\n";
     write_reg(dut, 0, 0xDEADBEEF); // optional: R0 usually reserved
+    tick(dut);
     auto [r0, _] = read_regs(dut, 0, 0);
+    tick(dut);
     std::cout << "R0: 0x" << std::hex << r0 << " (expected 0xDEADBEEF)\n";
-    assert(r0 == 0xDEADBEEF); // Unless R0 is hard-wired to 0, this should pass
+    assert(r0 == 0); // R0 should always read 0
 
     std::cout << "\n✅ All tests passed successfully.\n";
 
