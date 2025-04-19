@@ -19,10 +19,10 @@ all: build run
 # 	# make -C $(OBJ_DIR) -f V$(TOP_MODULE).mk V$(TOP_MODULE)
 
 build:
-	iverilog-0.10 -o $(OUT_VVD) $(VTESTBENCH)
+	iverilog -o $(OUT_VVD) $(VTESTBENCH)
 # Run the simulation
 run:
-	vvp-0.10 $(OUT_VVD)
+	vvp $(OUT_VVD)
 
 # Open waveform with GTKWave (optional)
 wave:
